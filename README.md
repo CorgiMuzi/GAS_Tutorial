@@ -1,6 +1,6 @@
 # GAS_Tutorial
 
-![Skills](https://skillicons.dev/icons?i=unreal,rider)
+[![Skills](https://skillicons.dev/icons?i=unreal,rider&theme=light)](https://skillicons.dev)
 
 > 🎮 Unreal Engine 5.5.4 기반의 Gameplay Ability System 학습 프로젝트입니다.  
 > 🖥️ JetBrains Rider를 사용하여 C++ 기반의 능력 시스템 구현을 연습할 수 있습니다.

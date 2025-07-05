@@ -3,28 +3,17 @@
 
 #include "Character/LabyrinthBaseCharacter.h"
 
-// Sets default values
 ALabyrinthBaseCharacter::ALabyrinthBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
+	WeaponMesh->SetupAttachment(GetMesh(), FName("WeaponSocket")); 
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 }
 
 void ALabyrinthBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-}
-
-void ALabyrinthBaseCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-void ALabyrinthBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 

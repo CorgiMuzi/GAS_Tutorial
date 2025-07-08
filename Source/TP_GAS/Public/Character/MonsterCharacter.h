@@ -17,4 +17,7 @@ public:
 	virtual void EnableHighlight() override;
 	virtual void DisableHighlight() override;
 	// ====== End Highlight Interface ======
+
+protected:
+	virtual void BeginPlay() override;
 };

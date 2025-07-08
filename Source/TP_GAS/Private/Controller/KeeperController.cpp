@@ -15,7 +15,7 @@ void AKeeperController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-
+	TraceUnderCursor();
 }
 
 void AKeeperController::BeginPlay()
@@ -60,7 +60,7 @@ void AKeeperController::TraceUnderCursor()
 	{
 		if (LastHighlight != CurrentHighlight)
 		{
-			if (!CurrentHighlight) CurrentHighlight->EnableHighlight();
+			if (CurrentHighlight) CurrentHighlight->EnableHighlight();
 			LastHighlight->DisableHighlight();
 		}
 	}else

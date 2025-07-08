@@ -3,18 +3,19 @@
 
 #include "Character/MonsterCharacter.h"
 
+void AMonsterCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+}
+
 void AMonsterCharacter::EnableHighlight()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, TEXT("Enable Highlight"));
-	}
+
 }
 
 void AMonsterCharacter::DisableHighlight()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Blue, TEXT("Disable Highlight"));
-	}
+
 }

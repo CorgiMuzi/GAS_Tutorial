@@ -1,0 +1,7 @@
+# Top-most EditorConfig file
+root = true
+
+# C/C++ source files
+[*.{h,cpp}]
+charset = utf-8
+end_of_line = crlf

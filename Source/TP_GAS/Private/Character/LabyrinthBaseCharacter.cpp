@@ -12,6 +12,11 @@ ALabyrinthBaseCharacter::ALabyrinthBaseCharacter()
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 }
 
+UAbilitySystemComponent* ALabyrinthBaseCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void ALabyrinthBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();

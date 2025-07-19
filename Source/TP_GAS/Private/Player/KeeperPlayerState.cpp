@@ -10,6 +10,7 @@ AKeeperPlayerState::AKeeperPlayerState()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<ULabyrinthAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	AttributeSet = CreateDefaultSubobject<ULabyrinthAttributeSet>(TEXT("AttributeSet"));
 

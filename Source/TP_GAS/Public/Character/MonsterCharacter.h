@@ -13,6 +13,8 @@ class TP_GAS_API AMonsterCharacter : public ALabyrinthBaseCharacter, public IHig
 	GENERATED_BODY()
 
 public:
+	AMonsterCharacter();
+
 	// ====== Highlight Interface ======
 	virtual void EnableHighlight() override;
 	virtual void DisableHighlight() override;
@@ -20,4 +22,5 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void InitAbilitySystem() override;
 };

@@ -4,28 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
-#include "GameFramework/Character.h"
-#include "LabyrinthBaseCharacter.generated.h"
+#include "GameFramework/PlayerState.h"
+#include "KeeperPlayerState.generated.h"
 
 class UAbilitySystemComponent;
 class UAttributeSet;
 
 UCLASS()
-class TP_GAS_API ALabyrinthBaseCharacter : public ACharacter, public IAbilitySystemInterface
+class TP_GAS_API AKeeperPlayerState : public APlayerState, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
-
 public:
-	ALabyrinthBaseCharacter();
+	AKeeperPlayerState();
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
-
-protected:
-	virtual void BeginPlay() override;
-	virtual void InitAbilitySystem() {};
-
-	UPROPERTY(EditDefaultsOnly, Category="Weapons")
-	TObjectPtr<UStaticMeshComponent> WeaponMesh;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

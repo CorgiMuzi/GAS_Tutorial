@@ -20,6 +20,10 @@ AKeeperCharacter::AKeeperCharacter()
 
 	KeeperCamera = CreateDefaultSubobject<UCameraComponent>("KeeperCamera");
 	KeeperCamera->SetupAttachment(SpringArm);
+
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
+	WeaponMesh->SetupAttachment(GetMesh(), FName("WeaponSocket"));
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 }
 
 void AKeeperCharacter::BeginPlay()

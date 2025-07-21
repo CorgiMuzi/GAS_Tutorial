@@ -23,6 +23,9 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilitySystem() override;
 
+	UPROPERTY(EditDefaultsOnly, Category="Weapons")
+	TObjectPtr<UStaticMeshComponent> WeaponMesh;
+
 private:
 	void SetupTopDownGameCameraView();
 	virtual void OnRep_PlayerState() override;

@@ -24,9 +24,6 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilitySystem() {};
 
-	UPROPERTY(EditDefaultsOnly, Category="Weapons")
-	TObjectPtr<UStaticMeshComponent> WeaponMesh;
-
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 

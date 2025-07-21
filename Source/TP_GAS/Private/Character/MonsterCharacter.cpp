@@ -35,12 +35,9 @@ void AMonsterCharacter::EnableHighlight()
 {
 	GetMesh()->SetRenderCustomDepth(true);
 	GetMesh()->SetCustomDepthStencilValue(1);
-	WeaponMesh->SetRenderCustomDepth(true);
-	WeaponMesh->SetCustomDepthStencilValue(1);
 }
 
 void AMonsterCharacter::DisableHighlight()
 {
 	GetMesh()->SetRenderCustomDepth(false);
-	WeaponMesh->SetRenderCustomDepth(false);
 }

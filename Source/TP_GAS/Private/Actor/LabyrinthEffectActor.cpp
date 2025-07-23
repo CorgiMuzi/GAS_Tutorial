@@ -36,7 +36,7 @@ void ALabyrinthEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, 
 	{
 		const ULabyrinthAttributeSet* LabyrinthAttributeSet = Cast<ULabyrinthAttributeSet>(ASInterface->GetAbilitySystemComponent()->GetAttributeSet(ULabyrinthAttributeSet::StaticClass()));
 		ULabyrinthAttributeSet* MutableLabyrinthAS = const_cast<ULabyrinthAttributeSet*>(LabyrinthAttributeSet);
-		MutableLabyrinthAS->SetHealth(MutableLabyrinthAS->GetHealth() + 25.f);
+		MutableLabyrinthAS->SetMana(MutableLabyrinthAS->GetMana() + 25.f);
 		Destroy();
 	}
 }

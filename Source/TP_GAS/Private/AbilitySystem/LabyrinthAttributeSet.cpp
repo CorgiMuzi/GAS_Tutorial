@@ -6,10 +6,13 @@
 
 ULabyrinthAttributeSet::ULabyrinthAttributeSet()
 {
-	InitHealth(100.f);
+	InitHealth(50.f);
+	InitMaxHealth(100.f);
+	InitMana(50.f);
+	InitMaxMana(100.f);
 }
 
-void ULabyrinthAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void ULabyrinthAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 

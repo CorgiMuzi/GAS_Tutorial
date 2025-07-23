@@ -24,9 +24,10 @@ void AKeeperController::BeginPlay()
 
 	check(KeeperContext);
 
-	UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(InputSubsystem);
-	InputSubsystem->AddMappingContext(KeeperContext, 0);
+	if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	{
+		InputSubsystem->AddMappingContext(KeeperContext, 0);
+	}
 
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Type::Default;

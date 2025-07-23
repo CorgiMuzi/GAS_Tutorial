@@ -5,9 +5,11 @@
 
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Controller/KeeperController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/KeeperPlayerState.h"
+#include "UI/HUD/LabyrinthHUD.h"
 
 AKeeperCharacter::AKeeperCharacter()
 {
@@ -20,21 +22,15 @@ AKeeperCharacter::AKeeperCharacter()
 
 	KeeperCamera = CreateDefaultSubobject<UCameraComponent>("KeeperCamera");
 	KeeperCamera->SetupAttachment(SpringArm);
+
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
+	WeaponMesh->SetupAttachment(GetMesh(), FName("WeaponSocket"));
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 }
 
 void AKeeperCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void AKeeperCharacter::InitAbilitySystem()
-{
-	AKeeperPlayerState* KeeperPlayerState = GetPlayerStateChecked<AKeeperPlayerState>();
-
-	AbilitySystemComponent = KeeperPlayerState->GetAbilitySystemComponent();
-	AbilitySystemComponent->InitAbilityActorInfo(KeeperPlayerState, this);
-
-	AttributeSet = KeeperPlayerState->GetAttributeSet();
 }
 
 void AKeeperCharacter::PossessedBy(AController* NewController)
@@ -49,6 +45,28 @@ void AKeeperCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	InitAbilitySystem();
+}
+
+void AKeeperCharacter::InitAbilitySystem()
+{
+	// Assert if player state is not valid
+	AKeeperPlayerState* KeeperPlayerState = GetPlayerStateChecked<AKeeperPlayerState>();
+
+	AbilitySystemComponent = KeeperPlayerState->GetAbilitySystemComponent();
+	AbilitySystemComponent->InitAbilityActorInfo(KeeperPlayerState, this);
+
+	AttributeSet = KeeperPlayerState->GetAttributeSet();
+
+	// Keeper Controller is valid on the local client only.
+	// If I use 'check' or 'checkf' for controller, remote clients' controller will throw errors
+	// That's why we use not check as KeeperPlayerState but if-statement
+	if (AKeeperController* KeeperController = Cast<AKeeperController>(GetController()))
+	{
+		if (ALabyrinthHUD* LabyrinthHUD = Cast<ALabyrinthHUD>(KeeperController->GetHUD()))
+		{
+			LabyrinthHUD->InitOverlay(KeeperController, KeeperPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
 
 void AKeeperCharacter::SetupTopDownGameCameraView()

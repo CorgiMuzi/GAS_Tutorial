@@ -7,9 +7,6 @@ ALabyrinthBaseCharacter::ALabyrinthBaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>("WeaponMesh");
-	WeaponMesh->SetupAttachment(GetMesh(), FName("WeaponSocket")); 
-	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 }
 
 UAbilitySystemComponent* ALabyrinthBaseCharacter::GetAbilitySystemComponent() const

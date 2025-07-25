@@ -18,7 +18,7 @@ void ALabyrinthEffectActor::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ALabyrinthEffectActor::ApplyEffectToTarget(AActor* ApplyingTarget, TSubclassOf<UGameplayEffect> ApplyingEffectClass) const
+void ALabyrinthEffectActor::ApplyEffectToTarget(AActor* ApplyingTarget, const TSubclassOf<UGameplayEffect> ApplyingEffectClass) const
 {
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ApplyingTarget);
 	if (TargetASC == nullptr) return;

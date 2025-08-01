@@ -4,6 +4,7 @@
 #include "AbilitySystem/LabyrinthAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Character.h"
 
 ULabyrinthAttributeSet::ULabyrinthAttributeSet()
@@ -44,25 +45,40 @@ void ULabyrinthAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	const FGameplayEffectContextHandle& EffectSpecHandle = Data.EffectSpec.GetEffectContext();
-	const UAbilitySystemComponent* SourceASC = EffectSpecHandle.GetOriginalInstigatorAbilitySystemComponent();
+	FEffectProperties Props;
+	SetGameplayEffectProperties(Data, Props);
+}
 
-	if (IsValid(SourceASC) && SourceASC->AbilityActorInfo.IsValid() && SourceASC->AbilityActorInfo->AvatarActor.IsValid())
+void ULabyrinthAttributeSet::SetGameplayEffectProperties(const FGameplayEffectModCallbackData& Data,
+	FEffectProperties& Props)
+{
+	Props.EffectContextHandle = Data.EffectSpec.GetEffectContext();
+	Props.SourceAbilitySystem = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+
+	if (IsValid(Props.SourceAbilitySystem) && Props.SourceAbilitySystem->AbilityActorInfo.IsValid() && Props.SourceAbilitySystem->AbilityActorInfo->AvatarActor.IsValid())
 	{
-		AActor* SourceAvatarActor = SourceASC->AbilityActorInfo->AvatarActor.Get();
-		const AController* SourceController = SourceASC->AbilityActorInfo->PlayerController.Get();
-		if (SourceController == nullptr && SourceAvatarActor != nullptr)
+		Props.SourceAvatarActor = Props.SourceAbilitySystem->AbilityActorInfo->AvatarActor.Get();
+		Props.SourceController = Props.SourceAbilitySystem->AbilityActorInfo->PlayerController.Get();
+		if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr)
 		{
-			if (const APawn* Pawn = Cast<APawn>(SourceAvatarActor))
+			if (const APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor))
 			{
-				SourceController = Pawn->GetController();
+				Props.SourceController = Pawn->GetController();
 			}
 		}
 
-		if (SourceController)
+		if (Props.SourceController)
 		{
-			ACharacter* SourceCharacter = Cast<ACharacter>(SourceController->GetPawn());
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
 		}
+	}
+
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Props.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
+		Props.TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
 	}
 }
 

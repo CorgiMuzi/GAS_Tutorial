@@ -13,6 +13,46 @@
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+USTRUCT()
+struct FEffectProperties
+{
+	GENERATED_BODY()
+
+public:
+	FEffectProperties(){}
+
+	UPROPERTY()
+	FGameplayEffectContextHandle EffectContextHandle;
+
+	//=== Source ===
+	UPROPERTY()
+	UAbilitySystemComponent* SourceAbilitySystem{nullptr};
+
+	UPROPERTY()
+	AActor* SourceAvatarActor{nullptr};
+
+	UPROPERTY()
+	AController* SourceController{nullptr};
+
+	UPROPERTY()
+	ACharacter* SourceCharacter{nullptr};
+	// === End Source ===
+
+	// === Target ===
+	UPROPERTY()
+	UAbilitySystemComponent* TargetAbilitySystem{nullptr};
+
+	UPROPERTY()
+	AActor* TargetAvatarActor{nullptr};
+
+	UPROPERTY()
+	AController* TargetController{nullptr};
+
+	UPROPERTY()
+	ACharacter* TargetCharacter{nullptr};
+	// === End Target ===
+};
+
 UCLASS()
 class TP_GAS_API ULabyrinthAttributeSet : public UAttributeSet
 {
@@ -37,6 +77,8 @@ public:
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
 
+	FEffectProperties EffectProperties;
+
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, Category="Vital Attribute")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Health);
@@ -52,4 +94,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxMana, Category="Vital Attribute")
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, MaxMana);
+
+private:
+	void SetGameplayEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props);
 };

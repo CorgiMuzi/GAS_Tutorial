@@ -3,46 +3,99 @@
 
 #include "Actor/LabyrinthEffectActor.h"
 
-#include "AbilitySystemInterface.h"
 #include "AbilitySystem/LabyrinthAttributeSet.h"
-#include "Components/SphereComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 ALabyrinthEffectActor::ALabyrinthEffectActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	SetRootComponent(Mesh);
-
-	PickupArea = CreateDefaultSubobject<USphereComponent>("Pickup Area");
-	PickupArea->SetupAttachment(GetRootComponent());
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot")));
 }
 
 void ALabyrinthEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	if (PickupArea)
+void ALabyrinthEffectActor::ApplyEffectToTarget(AActor* ApplyingTarget,
+                                                const TSubclassOf<UGameplayEffect> ApplyingEffectClass)
+{
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ApplyingTarget);
+	if (TargetASC == nullptr) return;
+
+	check(ApplyingEffectClass);
+	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(
+		ApplyingEffectClass, ActorLevel, EffectContextHandle);
+
+	const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(
+		*EffectSpecHandle.Data.Get());
+
+	const FActiveGameplayEffect* ActiveEffect = TargetASC->GetActiveGameplayEffect(ActiveEffectHandle);
+	const bool bIsInfinite = ActiveEffect && ActiveEffect->Spec.Def &&
+		ActiveEffect->Spec.Def->DurationPolicy == EGameplayEffectDurationType::Infinite;
+
+	if (bIsInfinite && InfiniteEffectRemovePolicy != EEffectRemovePolicy::DoNotRemove)
 	{
-		PickupArea->OnComponentBeginOverlap.AddDynamic(this, &ALabyrinthEffectActor::OnOverlap);
-		PickupArea->OnComponentEndOverlap.AddDynamic(this, &ALabyrinthEffectActor::EndOverlap);
+		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
 	}
 }
 
-void ALabyrinthEffectActor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ALabyrinthEffectActor::OnOverlap(AActor* TargetActor)
 {
-	if (IAbilitySystemInterface* ASInterface = Cast<IAbilitySystemInterface>(OtherActor))
+	if (InstantEffectApplyPolicy == EEffectApplyPolicy::ApplyOnOverlap)
 	{
-		const ULabyrinthAttributeSet* LabyrinthAttributeSet = Cast<ULabyrinthAttributeSet>(ASInterface->GetAbilitySystemComponent()->GetAttributeSet(ULabyrinthAttributeSet::StaticClass()));
-		ULabyrinthAttributeSet* MutableLabyrinthAS = const_cast<ULabyrinthAttributeSet*>(LabyrinthAttributeSet);
-		MutableLabyrinthAS->SetMana(MutableLabyrinthAS->GetMana() + 25.f);
-		Destroy();
+		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
+	}
+
+	if (DurationEffectApplyPolicy == EEffectApplyPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, DurationGameplayEffectClass);
+	}
+
+	if (InfiniteEffectApplyPolicy == EEffectApplyPolicy::ApplyOnOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClass);
 	}
 }
 
-void ALabyrinthEffectActor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ALabyrinthEffectActor::OnEndOverlap(AActor* TargetActor)
 {
+	if (InstantEffectApplyPolicy == EEffectApplyPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
+	}
 
+	if (DurationEffectApplyPolicy == EEffectApplyPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, DurationGameplayEffectClass);
+	}
+
+	if (InfiniteEffectApplyPolicy == EEffectApplyPolicy::ApplyOnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, InfiniteGameplayEffectClass);
+	}
+
+	if (InfiniteEffectRemovePolicy == EEffectRemovePolicy::RemoveOnEndOverlap)
+	{
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+		if (!IsValid(TargetASC)) return;
+
+		TArray<FActiveGameplayEffectHandle> HandlesToRemove;
+		for (auto HandlePair : ActiveEffectHandles)
+		{
+			if (HandlePair.Value == TargetASC)
+			{
+				TargetASC->RemoveActiveGameplayEffect(HandlePair.Key, 1);
+				HandlesToRemove.Add(HandlePair.Key);
+			}
+		}
+
+		for (FActiveGameplayEffectHandle& Handle : HandlesToRemove)
+		{
+			ActiveEffectHandles.FindAndRemoveChecked(Handle);
+		}
+	}
 }

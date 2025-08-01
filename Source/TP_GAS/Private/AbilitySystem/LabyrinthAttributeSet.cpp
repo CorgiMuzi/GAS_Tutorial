@@ -3,6 +3,9 @@
 
 #include "AbilitySystem/LabyrinthAttributeSet.h"
 #include "Net/UnrealNetwork.h"
+#include "GameplayEffectExtension.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameFramework/Character.h"
 
 ULabyrinthAttributeSet::ULabyrinthAttributeSet()
 {
@@ -20,6 +23,63 @@ void ULabyrinthAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+}
+
+void ULabyrinthAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
+	}
+
+	if (Attribute == GetManaAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
+	}
+
+}
+
+void ULabyrinthAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	FEffectProperties Props;
+	SetGameplayEffectProperties(Data, Props);
+}
+
+void ULabyrinthAttributeSet::SetGameplayEffectProperties(const FGameplayEffectModCallbackData& Data,
+	FEffectProperties& Props)
+{
+	Props.EffectContextHandle = Data.EffectSpec.GetEffectContext();
+	Props.SourceAbilitySystem = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+
+	if (IsValid(Props.SourceAbilitySystem) && Props.SourceAbilitySystem->AbilityActorInfo.IsValid() && Props.SourceAbilitySystem->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Props.SourceAvatarActor = Props.SourceAbilitySystem->AbilityActorInfo->AvatarActor.Get();
+		Props.SourceController = Props.SourceAbilitySystem->AbilityActorInfo->PlayerController.Get();
+		if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr)
+		{
+			if (const APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor))
+			{
+				Props.SourceController = Pawn->GetController();
+			}
+		}
+
+		if (Props.SourceController)
+		{
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
+		}
+	}
+
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Props.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
+		Props.TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+	}
 }
 
 void ULabyrinthAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const

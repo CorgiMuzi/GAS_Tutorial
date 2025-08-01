@@ -51,6 +51,9 @@ protected:
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Effects")
+	float ActorLevel = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Effects")
 	TSubclassOf<UGameplayEffect> InstantGameplayEffectClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Effects")

@@ -28,7 +28,7 @@ void ALabyrinthEffectActor::ApplyEffectToTarget(AActor* ApplyingTarget,
 	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
 	EffectContextHandle.AddSourceObject(this);
 	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(
-		ApplyingEffectClass, 1.f, EffectContextHandle);
+		ApplyingEffectClass, ActorLevel, EffectContextHandle);
 
 	const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(
 		*EffectSpecHandle.Data.Get());

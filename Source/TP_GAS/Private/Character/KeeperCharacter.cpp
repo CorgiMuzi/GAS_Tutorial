@@ -4,6 +4,7 @@
 #include "Character/KeeperCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/LabyrinthAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Controller/KeeperController.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -54,6 +55,8 @@ void AKeeperCharacter::InitAbilitySystem()
 
 	AbilitySystemComponent = KeeperPlayerState->GetAbilitySystemComponent();
 	AbilitySystemComponent->InitAbilityActorInfo(KeeperPlayerState, this);
+	ULabyrinthAbilitySystemComponent* LabyrinthASC = Cast<ULabyrinthAbilitySystemComponent>(AbilitySystemComponent);
+	LabyrinthASC->OnAbilitySystemInfoSet();
 
 	AttributeSet = KeeperPlayerState->GetAttributeSet();
 
@@ -67,6 +70,8 @@ void AKeeperCharacter::InitAbilitySystem()
 			LabyrinthHUD->InitOverlay(KeeperController, KeeperPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+
+	InitDefaultAttribute();
 }
 
 void AKeeperCharacter::SetupTopDownGameCameraView()

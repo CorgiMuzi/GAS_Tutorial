@@ -29,6 +29,8 @@ void AMonsterCharacter::InitAbilitySystem()
 {
 	check(AbilitySystemComponent);
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	ULabyrinthAbilitySystemComponent* LabyrinthASC = Cast<ULabyrinthAbilitySystemComponent>(AbilitySystemComponent);
+	LabyrinthASC->OnAbilitySystemInfoSet();
 }
 
 void AMonsterCharacter::EnableHighlight()

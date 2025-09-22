@@ -77,8 +77,54 @@ public:
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
 
+	UFUNCTION()
+	void OnRep_Strength(const FGameplayAttributeData& OldStrength) const;
+
+	UFUNCTION()
+	void OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const;
+
+	UFUNCTION()
+	void OnRep_Resilience(const FGameplayAttributeData& OldResilience) const;
+
+	UFUNCTION()
+	void OnRep_Vigor(const FGameplayAttributeData& OldVigor) const;
+
+	UFUNCTION()
+	void OnRep_Luck(const FGameplayAttributeData& OldLuck) const;
+
+	UFUNCTION()
+	void OnRep_HealthRegen(const FGameplayAttributeData& OldHealthRegen) const;
+
+	UFUNCTION()
+	void OnRep_ManaRegen(const FGameplayAttributeData& OldManaRegen) const;
+
+	UFUNCTION()
+	void OnRep_Evasion(const FGameplayAttributeData& OldEvasion) const;
+
+	UFUNCTION()
+	void OnRep_Armor(const FGameplayAttributeData& OldArmor) const;
+
+	UFUNCTION()
+	void OnRep_ArmorPenetration(const FGameplayAttributeData& OldArmorPenetration) const;
+
+	UFUNCTION()
+	void OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const;
+
+	UFUNCTION()
+	void OnRep_CriticalResistChance(const FGameplayAttributeData& OldCriticalResistChance) const;
+
+	UFUNCTION()
+	void OnRep_ProcChance(const FGameplayAttributeData& OldProcChance) const;
+
+	UFUNCTION()
+	void OnRep_ResistChance(const FGameplayAttributeData& OldResistChance) const;
+
+
 	FEffectProperties EffectProperties;
 
+	/*
+	 * Vital attribute
+	 */
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Health, Category="Vital Attribute")
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Health);
@@ -94,6 +140,72 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MaxMana, Category="Vital Attribute")
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, MaxMana);
+
+	UPROPERTY(BlueprintReadOnly, Category="Vital Attribute")
+	FGameplayAttributeData GhostHealth;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, GhostHealth);
+
+	/*
+	 * Primary attributes
+	*/
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Strength, Category="Primary Attribute")
+	FGameplayAttributeData Strength;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Strength);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Intelligence, Category="Primary Attribute")
+	FGameplayAttributeData Intelligence;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Intelligence);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Resilience, Category="Primary Attribute")
+	FGameplayAttributeData Resilience;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Resilience);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Vigor, Category="Primary Attribute")
+	FGameplayAttributeData Vigor;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Vigor);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Luck, Category="Primary Attribute")
+	FGameplayAttributeData Luck;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Luck);
+
+	/*
+	 * Secondary attribute
+	 */
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_HealthRegen, Category="Secondary Attribute")
+	FGameplayAttributeData HealthRegen;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, HealthRegen)
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_ManaRegen, Category="Secondary Attribute")
+	FGameplayAttributeData ManaRegen;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, ManaRegen)
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Evasion, Category="Secondary Attribute")
+	FGameplayAttributeData Evasion;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Evasion);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Armor, Category="Secondary Attribtue")
+	FGameplayAttributeData Armor;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, Armor);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_ArmorPenetration, Category="Secondary Attribute")
+	FGameplayAttributeData ArmorPenetration;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, ArmorPenetration);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_CriticalHitChance, Category="Secondary Attribute")
+	FGameplayAttributeData CriticalHitChance;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, CriticalHitChance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_CriticalResistChance, Category="Secondary Attribute")
+	FGameplayAttributeData CriticalResistChance;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, CriticalResistChance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_ProcChance, Category="Secondary Attribute")
+	FGameplayAttributeData ProcChance;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, ProcChance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_ResistChance, Category="Secondary Attribute")
+	FGameplayAttributeData ResistChance;
+	ATTRIBUTE_ACCESSORS(ULabyrinthAttributeSet, ResistChance);
 
 private:
 	void SetGameplayEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props);

@@ -10,14 +10,26 @@
 ULabyrinthAttributeSet::ULabyrinthAttributeSet()
 {
 	InitHealth(50.f);
-	InitMaxHealth(100.f);
 	InitMana(50.f);
-	InitMaxMana(100.f);
 }
 
 void ULabyrinthAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Intelligence, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Resilience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Vigor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Luck, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, ArmorPenetration, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, CriticalHitChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, CriticalResistChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Evasion, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, ProcChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, ResistChance, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ULabyrinthAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
@@ -38,7 +50,6 @@ void ULabyrinthAttributeSet::PreAttributeChange(const FGameplayAttribute& Attrib
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
-
 }
 
 void ULabyrinthAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -47,15 +58,26 @@ void ULabyrinthAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 
 	FEffectProperties Props;
 	SetGameplayEffectProperties(Data, Props);
+
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+
+	if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
 }
 
 void ULabyrinthAttributeSet::SetGameplayEffectProperties(const FGameplayEffectModCallbackData& Data,
-	FEffectProperties& Props)
+                                                         FEffectProperties& Props)
 {
 	Props.EffectContextHandle = Data.EffectSpec.GetEffectContext();
 	Props.SourceAbilitySystem = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
 
-	if (IsValid(Props.SourceAbilitySystem) && Props.SourceAbilitySystem->AbilityActorInfo.IsValid() && Props.SourceAbilitySystem->AbilityActorInfo->AvatarActor.IsValid())
+	if (IsValid(Props.SourceAbilitySystem) && Props.SourceAbilitySystem->AbilityActorInfo.IsValid() && Props.
+		SourceAbilitySystem->AbilityActorInfo->AvatarActor.IsValid())
 	{
 		Props.SourceAvatarActor = Props.SourceAbilitySystem->AbilityActorInfo->AvatarActor.Get();
 		Props.SourceController = Props.SourceAbilitySystem->AbilityActorInfo->PlayerController.Get();
@@ -100,4 +122,74 @@ void ULabyrinthAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldMana) c
 void ULabyrinthAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, MaxMana, OldMaxMana);
+}
+
+void ULabyrinthAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, Strength, OldStrength);
+}
+
+void ULabyrinthAttributeSet::OnRep_Intelligence(const FGameplayAttributeData& OldIntelligence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, Intelligence, OldIntelligence);
+}
+
+void ULabyrinthAttributeSet::OnRep_Resilience(const FGameplayAttributeData& OldResilience) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, Resilience, OldResilience);
+}
+
+void ULabyrinthAttributeSet::OnRep_Vigor(const FGameplayAttributeData& OldVigor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, Vigor, OldVigor);
+}
+
+void ULabyrinthAttributeSet::OnRep_Luck(const FGameplayAttributeData& OldLuck) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, Luck, OldLuck);
+}
+
+void ULabyrinthAttributeSet::OnRep_HealthRegen(const FGameplayAttributeData& OldHealthRegen) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, HealthRegen, OldHealthRegen);
+}
+
+void ULabyrinthAttributeSet::OnRep_ManaRegen(const FGameplayAttributeData& OldManaRegen) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, ManaRegen, OldManaRegen);
+}
+
+void ULabyrinthAttributeSet::OnRep_Evasion(const FGameplayAttributeData& OldEvasion) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, Evasion, OldEvasion);
+}
+
+void ULabyrinthAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, Armor, OldArmor);
+}
+
+void ULabyrinthAttributeSet::OnRep_ArmorPenetration(const FGameplayAttributeData& OldArmorPenetration) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, ArmorPenetration, OldArmorPenetration);
+}
+
+void ULabyrinthAttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, CriticalHitChance, OldCriticalHitChance);
+}
+
+void ULabyrinthAttributeSet::OnRep_CriticalResistChance(const FGameplayAttributeData& OldCriticalResistChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, CriticalResistChance, OldCriticalResistChance);
+}
+
+void ULabyrinthAttributeSet::OnRep_ProcChance(const FGameplayAttributeData& OldProcChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, ProcChance, OldProcChance);
+}
+
+void ULabyrinthAttributeSet::OnRep_ResistChance(const FGameplayAttributeData& OldResistChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ULabyrinthAttributeSet, ResistChance, OldResistChance);
 }

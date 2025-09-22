@@ -3,15 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UI/WidgetController/LabyrinthWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedDelegate, float, NewHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedDelegate, float, NewMaxHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedDelegate, float, NewMana);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedDelegate, float, NewMaxMana);
+USTRUCT(BlueprintType)
+struct FGameplayTagDebugInfo : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag TargetTag = FGameplayTag();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText Message = FText();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<class ULabyrinthUserWidget> MessageWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UTexture2D> Image;
+};
 
 struct FOnAttributeChangeData;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVitalAttributeReducedSignature, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGameplayTagDebugSignature, FGameplayTagDebugInfo, DebugInfo);
 
 UCLASS(BlueprintType, Blueprintable)
 class TP_GAS_API UOverlayWidgetController : public ULabyrinthWidgetController
@@ -23,20 +41,33 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
-	FOnHealthChangedDelegate OnHealthChangedDelegate;
+	FOnAttributeChangedSignature OnHealthChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
-	FOnMaxHealthChangedDelegate OnMaxHealthChangedDelegate;
+	FOnAttributeChangedSignature OnMaxHealthChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
-	FOnManaChangedDelegate OnManaChangedDelegate;
+	FOnAttributeChangedSignature OnManaChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
-	FOnMaxManaChangedDelegate OnMaxManaChangedDelegate;
+	FOnAttributeChangedSignature OnMaxManaChangedDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attribute")
+	FOnVitalAttributeReducedSignature OnVitalAttributeReducedDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Debug")
+	FGameplayTagDebugSignature GameplayTagDebugMessageDelegate;
 
 protected:
-	void OnHealthChanged(const FOnAttributeChangeData& Data) const;
-	void OnMaxHealthChanged(const FOnAttributeChangeData& Data) const;
-	void OnManaChanged(const FOnAttributeChangeData& Data) const;
-	void OnMaxManaChanged(const FOnAttributeChangeData& Data) const;
+	UPROPERTY(EditDefaultsOnly, Category="Widget Data")
+	TObjectPtr<UDataTable> TagInfoDataTable;
+
+	template<typename T>
+	T* GetDataTableRowByTag(const UDataTable* DataTable, const FGameplayTag& Tag);
 };
+
+template <typename T>
+T* UOverlayWidgetController::GetDataTableRowByTag(const UDataTable* DataTable, const FGameplayTag& Tag)
+{
+	return DataTable->FindRow<T>(Tag.GetTagName(), TEXT(""));
+}

@@ -3,6 +3,7 @@
 
 #include "UI/WidgetController/OverlayWidgetController.h"
 
+#include "AbilitySystem/LabyrinthAbilitySystemComponent.h"
 #include "AbilitySystem/LabyrinthAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValue()
@@ -19,47 +20,62 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	const ULabyrinthAttributeSet* LabyrinthAttributeSet = CastChecked<ULabyrinthAttributeSet>(AttributeSet);
 
+
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		LabyrinthAttributeSet->GetHealthAttribute()).AddUObject(
-		this,
-		&UOverlayWidgetController::OnHealthChanged
+		LabyrinthAttributeSet->GetHealthAttribute()).AddLambda(
+			[this] (const FOnAttributeChangeData& Data)
+			{
+				if (Data.OldValue > Data.NewValue)
+				{
+					OnVitalAttributeReducedDelegate.Broadcast(Data.NewValue);
+				}
+
+				OnHealthChangedDelegate.Broadcast(Data.NewValue);
+			}
 	);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		LabyrinthAttributeSet->GetMaxHealthAttribute()).AddUObject(
-		this,
-		&UOverlayWidgetController::OnMaxHealthChanged
+		LabyrinthAttributeSet->GetMaxHealthAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxHealthChangedDelegate.Broadcast(Data.NewValue);
+		}
 	);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		LabyrinthAttributeSet->GetManaAttribute()).AddUObject(
-		this,
-		&UOverlayWidgetController::OnManaChanged
+		LabyrinthAttributeSet->GetManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			if (Data.OldValue > Data.NewValue) 	
+			{
+				OnVitalAttributeReducedDelegate.Broadcast(Data.NewValue);
+			}
+
+			OnManaChangedDelegate.Broadcast(Data.NewValue);
+		}
 	);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		LabyrinthAttributeSet->GetMaxManaAttribute()).AddUObject(
-		this,
-		&UOverlayWidgetController::OnMaxManaChanged
+		LabyrinthAttributeSet->GetMaxManaAttribute()).AddLambda(
+		[this](const FOnAttributeChangeData& Data)
+		{
+			OnMaxManaChangedDelegate.Broadcast(Data.NewValue);
+		}
 	);
-}
 
-void UOverlayWidgetController::OnHealthChanged(const FOnAttributeChangeData& Data) const
-{
-	OnHealthChangedDelegate.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::OnMaxHealthChanged(const FOnAttributeChangeData& Data) const
-{
-	OnMaxHealthChangedDelegate.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::OnManaChanged(const FOnAttributeChangeData& Data) const
-{
-	OnManaChangedDelegate.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::OnMaxManaChanged(const FOnAttributeChangeData& Data) const
-{
-	OnMaxManaChangedDelegate.Broadcast(Data.NewValue);
+	Cast<ULabyrinthAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTag.AddLambda(
+		[this](const FGameplayTagContainer& AssetTags)
+		{
+			for (FGameplayTag Tag : AssetTags)
+			{
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				if (Tag.MatchesTag(MessageTag))
+				{
+					const FGameplayTagDebugInfo* Row = GetDataTableRowByTag<FGameplayTagDebugInfo>(
+						TagInfoDataTable, Tag);
+					GameplayTagDebugMessageDelegate.Broadcast(*Row);
+				}
+			}
+		}
+	);
 }
